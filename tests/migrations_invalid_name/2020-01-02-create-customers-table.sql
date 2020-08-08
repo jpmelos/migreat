@@ -1,0 +1,4 @@
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(250) NOT NULL UNIQUE CHECK (CHAR_LENGTH(name) > 0)
+);

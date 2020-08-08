@@ -1,0 +1,4 @@
+/.coverage
+/htmlcov
+/migreat.egg-info
+/pip-wheel-metadata
