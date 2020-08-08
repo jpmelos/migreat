@@ -37,7 +37,7 @@ setup(
     author="João Sampaio",
     author_email="jpmelos@gmail.com",
     version=find_version(),
-    description="A very flexible SQL migration runner.",
+    description="A flexible SQL migration runner.",
     long_description=(
         "For more information, visit https://github.com/jpmelos/migreat."
     ),
