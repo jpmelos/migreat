@@ -10,9 +10,13 @@ Right now, supports only PostgreSQL, as it's still an experiment. Support for an
 pip install migreat
 ```
 
+## Mental Model
+
+`migreat` runs SQL migrations with a DB cursor provided by your code via a function, and stores migration metadata in a table with the datetime it was run, the ID of the user who ran it, the name of the migration, and a hash of its contents at the time it was run. The hash of a migration will be checked against if it is ever rolled back, to make sure we are rolling back the same migration that was once run.
+
 ## Usage
 
-Migrations are simple SQL files placed inside a directory and following a name pattern. The name pattern is `YEAR-MONTH-DAY-SEQNUM-arbitrary-name.sql`. `YEAR-MONTH-DAY` is the day's date following ISO 8601. The `SEQNUM` is a sequential number for migrations released in the same day. Some valid names:
+Migrations are simple SQL files placed inside a directory and following a name pattern. The name pattern is `YEAR-MONTH-DAY-SEQNUM-arbitrary-name.sql`. `YEAR-MONTH-DAY` is the day's date following ISO 8601. The `SEQNUM` is a 2-digit sequential number for migrations released in the same day. Some valid names:
 
 ```
 2020-01-10-03-create-users-table.sql
@@ -39,7 +43,11 @@ $ migreat run \
     --rollback
 ```
 
-This will run the migrations as user with ID 42, run migrations only up to migration `2020-01-01-01`, it will run the function `yourapp.db.atomic` with no arguments and expect a DBAPI cursor (see tests for an example), and will do it backwards, rolling back all migrations up to `2020-01-01-01`.
+This will:
+
+- Run the migrations as user with ID 42;
+- Run migrations rolling them back, only back up to migration `2020-01-01-01`;
+- Run the function `yourapp.db.atomic` with no arguments expecting it to return a DBAPI cursor (see tests for an example).
 
 `migreat` allows you to constrain the user ID to real user IDs you might have in some table in your database. To enable it:
 
@@ -77,13 +85,15 @@ Values are valid CSV strings and can contain nested commas inside proper delimit
 
 Clone the source code from GitHub.
 
-Install dependencies (recommended to do this in a virtual environment):
+Create a new virtual environment.
+
+Install dependencies:
 
 ```
 pip install -r requirements.txt
 ```
 
-To spin up a test database in a Docker Engine:
+Spin up a test database in a Docker Engine:
 
 ```
 docker run -d \
@@ -103,7 +113,7 @@ export DB_PASS=migreat
 export DB_USER=migreat
 ```
 
-Run the tests with:
+Run the tests:
 
 ```
 coverage run -m pytest
