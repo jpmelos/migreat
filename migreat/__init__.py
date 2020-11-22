@@ -235,7 +235,9 @@ def _table_exists(cursor, table_name):
 
 
 def create_migrations_table(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None,
+    cursor_factory,
+    cursor_factory_args=None,
+    cursor_factory_kwargs=None,
 ):
     """Create the migrations table.
 
@@ -254,7 +256,8 @@ def create_migrations_table(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args, **cursor_factory_kwargs,
+        *cursor_factory_args,
+        **cursor_factory_kwargs,
     ) as cursor:
         try:
             cursor.execute(
@@ -270,13 +273,15 @@ def create_migrations_table(
                     );
                 """,
             )
-            logger.info('Created migrations table.')
+            logger.info("Created migrations table.")
         except psycopg2.errors.DuplicateTable:
-            logger.info('Migrations table already exists.')
+            logger.info("Migrations table already exists.")
 
 
 def drop_migrations_table(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None,
+    cursor_factory,
+    cursor_factory_args=None,
+    cursor_factory_kwargs=None,
 ):
     """Drop the migrations table.
 
@@ -292,11 +297,12 @@ def drop_migrations_table(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args, **cursor_factory_kwargs,
+        *cursor_factory_args,
+        **cursor_factory_kwargs,
     ) as cursor:
         try:
             cursor.execute("DROP TABLE migreat_migrations;")
-            logger.info('Dropped migrations table.')
+            logger.info("Dropped migrations table.")
         except psycopg2.errors.UndefinedTable:
             logger.info("Migrations table doesn't exist.")
 
@@ -324,7 +330,8 @@ def create_user_id_foreign_key(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args, **cursor_factory_kwargs,
+        *cursor_factory_args,
+        **cursor_factory_kwargs,
     ) as cursor:
         try:
             cursor.execute(
@@ -335,13 +342,15 @@ def create_user_id_foreign_key(
                             REFERENCES {users_table} ({user_id_field});
                 """,
             )
-            logger.info('Created the user_id foreign key constraint.')
+            logger.info("Created the user_id foreign key constraint.")
         except psycopg2.errors.DuplicateObject:
-            logger.info('user_id foreign key constraint already exists.')
+            logger.info("user_id foreign key constraint already exists.")
 
 
 def drop_user_id_foreign_key(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None,
+    cursor_factory,
+    cursor_factory_args=None,
+    cursor_factory_kwargs=None,
 ):
     """Drop the user_id foreign key.
 
@@ -357,7 +366,8 @@ def drop_user_id_foreign_key(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args, **cursor_factory_kwargs,
+        *cursor_factory_args,
+        **cursor_factory_kwargs,
     ) as cursor:
         try:
             cursor.execute(
@@ -366,7 +376,7 @@ def drop_user_id_foreign_key(
                         DROP CONSTRAINT migreat_migrations_user_id_fk;
                 """,
             )
-            logger.info('Dropped the user_id foreign key constraint.')
+            logger.info("Dropped the user_id foreign key constraint.")
         except psycopg2.errors.UndefinedObject:
             logger.info("user_id foreign key constraint doesn't exist.")
 
@@ -396,7 +406,9 @@ def _has_run_before(cursor, migration):
     migration_hash = record[0]
     if migration_hash != migration.hash:
         raise InvalidMigrationHash(
-            migration.name, migration.hash, migration_hash,
+            migration.name,
+            migration.hash,
+            migration_hash,
         )
 
     return True
@@ -505,11 +517,11 @@ def run_migrations(
         and migration_file.name.endswith(".sql")
         and not migration_file.name.endswith(".rollback.sql")
     ]
-    migrations = list(sorted(
+    migrations = sorted(
         (Migration(path) for path in migration_paths),
         key=operator.attrgetter("sequence_number"),
         reverse=rollback,
-    ))
+    )
 
     if not migrations:
         logger.info("Done.")
@@ -531,18 +543,25 @@ def run_migrations(
     # If specified a stop, deselect the migrations that shouldn't be applied.
     if sequence_end:
         if rollback:
-            migrations = list(filter(
-                lambda m: m.sequence_number >= sequence_end, migrations,
-            ))
+            migrations = list(
+                filter(
+                    lambda m: m.sequence_number >= sequence_end,
+                    migrations,
+                ),
+            )
         else:
-            migrations = list(filter(
-                lambda m: m.sequence_number <= sequence_end, migrations,
-            ))
+            migrations = list(
+                filter(
+                    lambda m: m.sequence_number <= sequence_end,
+                    migrations,
+                ),
+            )
 
     logger.info(f"Found {len(migrations)} migrations.")
 
     with cursor_factory(
-        *cursor_factory_args, **cursor_factory_kwargs,
+        *cursor_factory_args,
+        **cursor_factory_kwargs,
     ) as cursor:
         if not _table_exists(cursor, "migreat_migrations"):
             raise MigrationsTableDoesNotExist
@@ -550,7 +569,8 @@ def run_migrations(
     # Run migrations.
     for migration in migrations:
         with cursor_factory(
-            *cursor_factory_args, **cursor_factory_kwargs,
+            *cursor_factory_args,
+            **cursor_factory_kwargs,
         ) as cursor:
             has_run_before = _has_run_before(cursor, migration)
             should_run = has_run_before == rollback

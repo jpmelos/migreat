@@ -65,5 +65,7 @@ def _migrations_table():
 @pytest.fixture()
 def _migrations(_migrations_table, migrations_dir):
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )

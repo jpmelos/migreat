@@ -138,7 +138,8 @@ def run(
     user_id = _require(user_id or config.get("user-id"), "user-id")
     cursor_factory = _import(
         _require(
-            cursor_factory or config.get("cursor-factory"), "cursor-factory",
+            cursor_factory or config.get("cursor-factory"),
+            "cursor-factory",
         ),
     )
     cursor_factory_args = _process_csv_args(
@@ -164,12 +165,15 @@ def run(
 @click.option("--cursor-factory-args")
 @click.option("--cursor-factory-kwargs")
 def create_migrations_table(
-    cursor_factory, cursor_factory_args, cursor_factory_kwargs,
+    cursor_factory,
+    cursor_factory_args,
+    cursor_factory_kwargs,
 ):
     config = _get_config()
     cursor_factory = _import(
         _require(
-            cursor_factory or config.get("cursor-factory"), "cursor-factory",
+            cursor_factory or config.get("cursor-factory"),
+            "cursor-factory",
         ),
     )
     cursor_factory_args = _process_csv_args(
@@ -187,12 +191,15 @@ def create_migrations_table(
 @click.option("--cursor-factory-args")
 @click.option("--cursor-factory-kwargs")
 def drop_migrations_table(
-    cursor_factory, cursor_factory_args, cursor_factory_kwargs,
+    cursor_factory,
+    cursor_factory_args,
+    cursor_factory_kwargs,
 ):
     config = _get_config()
     cursor_factory = _import(
         _require(
-            cursor_factory or config.get("cursor-factory"), "cursor-factory",
+            cursor_factory or config.get("cursor-factory"),
+            "cursor-factory",
         ),
     )
     cursor_factory_args = _process_csv_args(
@@ -221,7 +228,8 @@ def create_user_id_foreign_key(
     config = _get_config()
     cursor_factory = _import(
         _require(
-            cursor_factory or config.get("cursor-factory"), "cursor-factory",
+            cursor_factory or config.get("cursor-factory"),
+            "cursor-factory",
         ),
     )
     cursor_factory_args = _process_csv_args(
@@ -245,12 +253,15 @@ def create_user_id_foreign_key(
 @click.option("--cursor-factory-args")
 @click.option("--cursor-factory-kwargs")
 def drop_user_id_foreign_key(
-    cursor_factory, cursor_factory_args, cursor_factory_kwargs,
+    cursor_factory,
+    cursor_factory_args,
+    cursor_factory_kwargs,
 ):
     config = _get_config()
     cursor_factory = _import(
         _require(
-            cursor_factory or config.get("cursor-factory"), "cursor-factory",
+            cursor_factory or config.get("cursor-factory"),
+            "cursor-factory",
         ),
     )
     cursor_factory_args = _process_csv_args(
@@ -261,7 +272,9 @@ def drop_user_id_foreign_key(
     )
 
     drop_foreign_key(
-        cursor_factory, cursor_factory_args, cursor_factory_kwargs,
+        cursor_factory,
+        cursor_factory_args,
+        cursor_factory_kwargs,
     )
 
 

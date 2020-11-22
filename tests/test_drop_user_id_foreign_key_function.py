@@ -7,7 +7,9 @@ from tests.fakepkg.postgresql import atomic
 @pytest.fixture(autouse=True)
 def _user_id_foreign_key(_migrations_table, _migrations):
     create_user_id_foreign_key(
-        cursor_factory=atomic, users_table="users", user_id_field="id",
+        cursor_factory=atomic,
+        users_table="users",
+        user_id_field="id",
     )
 
 

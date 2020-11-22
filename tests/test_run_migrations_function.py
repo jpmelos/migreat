@@ -34,7 +34,9 @@ def invalid_name_migrations_dir(this_path):
 
 def test_it_runs_forward(_migrations_table, migrations_dir):
     run_migrations(
-        user_id=42, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=42,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     with atomic() as cursor:
         assert _table_exists(cursor, "users")
@@ -58,7 +60,8 @@ def test_it_runs_forward(_migrations_table, migrations_dir):
 
 
 def test_it_runs_forward_up_to_a_given_point(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
         user_id=1,
@@ -81,7 +84,8 @@ def test_it_runs_forward_up_to_a_given_point(
 
 
 def test_it_runs_forward_from_previously_ran_migrations(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
         user_id=1,
@@ -90,7 +94,9 @@ def test_it_runs_forward_from_previously_ran_migrations(
         last_migration="2020-01-01-01",
     )
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     with atomic() as cursor:
         assert _table_exists(cursor, "migreat_migrations")
@@ -115,13 +121,18 @@ def test_it_runs_forward_from_previously_ran_migrations(
 
 
 def test_it_runs_when_no_migrations_left_to_run(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     with atomic() as cursor:
         assert _table_exists(cursor, "migreat_migrations")
@@ -147,7 +158,9 @@ def test_it_runs_when_no_migrations_left_to_run(
 
 def test_it_runs_rollback(_migrations_table, migrations_dir):
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     run_migrations(
         user_id=1,
@@ -161,10 +174,13 @@ def test_it_runs_rollback(_migrations_table, migrations_dir):
 
 
 def test_it_runs_rollback_up_to_a_given_point(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     run_migrations(
         user_id=1,
@@ -188,7 +204,8 @@ def test_it_runs_rollback_up_to_a_given_point(
 
 
 def test_it_does_nothing_rollback_when_no_migrations_ran(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
         user_id=1,
@@ -202,10 +219,13 @@ def test_it_does_nothing_rollback_when_no_migrations_ran(
 
 
 def test_it_does_nothing_when_no_migrations_exist(
-    _migrations_table, migrations_empty_dir,
+    _migrations_table,
+    migrations_empty_dir,
 ):
     run_migrations(
-        user_id=1, migrations_dir=migrations_empty_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_empty_dir,
+        cursor_factory=atomic,
     )
     with atomic() as cursor:
         assert not _table_exists(cursor, "users")
@@ -213,7 +233,8 @@ def test_it_does_nothing_when_no_migrations_exist(
 
 
 def test_it_does_nothing_rollback_when_no_migrations_exist(
-    _migrations_table, migrations_empty_dir,
+    _migrations_table,
+    migrations_empty_dir,
 ):
     run_migrations(
         user_id=1,
@@ -227,7 +248,8 @@ def test_it_does_nothing_rollback_when_no_migrations_exist(
 
 
 def test_it_raises_when_there_are_repeated_sequence_numbers(
-    _migrations_table, repeated_sq_migrations_dir,
+    _migrations_table,
+    repeated_sq_migrations_dir,
 ):
     with pytest.raises(RepeatedMigrationSequenceNumber):
         run_migrations(
@@ -240,15 +262,20 @@ def test_it_raises_when_there_are_repeated_sequence_numbers(
 def test_it_raises_if_migrations_table_doesnt_exist(migrations_dir):
     with pytest.raises(MigrationsTableDoesNotExist):
         run_migrations(
-            user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+            user_id=1,
+            migrations_dir=migrations_dir,
+            cursor_factory=atomic,
         )
 
 
 def test_it_raises_when_migration_hash_doesnt_match(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     run_migrations(
-        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic,
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
     )
     with atomic() as cursor:
         cursor.execute(
@@ -270,7 +297,8 @@ def test_it_raises_when_migration_hash_doesnt_match(
 
 
 def test_it_raises_when_trying_to_rollback_no_rollback_migration(
-    _migrations_table, no_rollback_migrations_dir,
+    _migrations_table,
+    no_rollback_migrations_dir,
 ):
     run_migrations(
         user_id=1,
@@ -287,7 +315,8 @@ def test_it_raises_when_trying_to_rollback_no_rollback_migration(
 
 
 def test_it_raises_when_migration_has_invalid_name(
-    _migrations_table, invalid_name_migrations_dir,
+    _migrations_table,
+    invalid_name_migrations_dir,
 ):
     with pytest.raises(InvalidMigrationNameOrPrefix):
         run_migrations(
@@ -298,7 +327,8 @@ def test_it_raises_when_migration_has_invalid_name(
 
 
 def test_it_raises_when_last_migration_has_invalid_name(
-    _migrations_table, migrations_dir,
+    _migrations_table,
+    migrations_dir,
 ):
     with pytest.raises(InvalidMigrationNameOrPrefix):
         run_migrations(

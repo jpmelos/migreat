@@ -7,7 +7,9 @@ from tests.fakepkg.postgresql import atomic
 
 def test_it_creates_the_foreign_key(_migrations):
     create_user_id_foreign_key(
-        cursor_factory=atomic, users_table="users", user_id_field="id",
+        cursor_factory=atomic,
+        users_table="users",
+        user_id_field="id",
     )
     with atomic() as cursor:
         cursor.execute(
@@ -33,10 +35,14 @@ def test_it_creates_the_foreign_key(_migrations):
 
 def test_it_does_nothing_if_foreign_key_already_exists(_migrations):
     create_user_id_foreign_key(
-        cursor_factory=atomic, users_table="users", user_id_field="id",
+        cursor_factory=atomic,
+        users_table="users",
+        user_id_field="id",
     )
     create_user_id_foreign_key(
-        cursor_factory=atomic, users_table="users", user_id_field="id",
+        cursor_factory=atomic,
+        users_table="users",
+        user_id_field="id",
     )
     with atomic() as cursor:
         cursor.execute(
