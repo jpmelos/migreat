@@ -78,7 +78,7 @@ def _require(value, name):
     return value
 
 
-def _get_config(*args, **kwargs):
+def _get_config():
     config = configparser.ConfigParser()
     config.read(".migreatrc")
     if "migreat" in config:
