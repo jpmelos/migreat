@@ -74,7 +74,7 @@ from migreat import run_migrations
 
 def _require(value, name):
     if not value:
-        raise ValueError(f"{name} is required")
+        raise ValueError(f"{name} is required.")
     return value
 
 
@@ -105,7 +105,7 @@ def _process_csv_kwargs(kwargs):
 
     keys_and_values = list(csv.reader(StringIO(kwargs)))[0]
     if len(keys_and_values) % 2 != 0:
-        raise ValueError
+        raise ValueError("Every key must have a value.")
     return dict(zip(keys_and_values[::2], keys_and_values[1::2]))
 
 
