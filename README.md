@@ -45,6 +45,8 @@ $ migreat run \
 
 This will:
 
+- Look for the migrations in directory `migrations` relative to the current working directory;
+  - If this is not supplied, the default value will be `migrations`;
 - Run the migrations as user with ID 42;
 - Run migrations rolling them back, only back up to migration `2020-01-01-01`;
 - Run the function `yourapp.db.atomic` with no arguments expecting it to return a DBAPI cursor (see tests for an example).
