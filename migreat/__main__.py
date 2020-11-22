@@ -115,7 +115,7 @@ def cli():
 
 
 @cli.command()
-@click.option("--migrations-dir", type=Path)
+@click.option("--migrations-dir")
 @click.option("--user-id")
 @click.option("--cursor-factory")
 @click.option("--cursor-factory-args")
@@ -133,7 +133,7 @@ def run(
 ):
     config = _get_config()
     migrations_dir = Path(
-        migrations_dir or config.get("migrations-dir") or Path("migrations"),
+        migrations_dir or config.get("migrations-dir") or "migrations",
     )
     user_id = _require(user_id or config.get("user-id"), "user-id")
     cursor_factory = _import(
