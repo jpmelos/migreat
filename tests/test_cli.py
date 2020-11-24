@@ -99,7 +99,7 @@ def test_it_raises_when_missing_cursor_factory():
     runner = CliRunner()
     result = runner.invoke(
         run,
-        shlex.split("--migrations-dir tests/migrations" " --user-id 42"),
+        shlex.split("--migrations-dir tests/migrations --user-id 42"),
     )
 
     assert isinstance(result.exception, ValueError)
