@@ -7,7 +7,7 @@ from functools import cached_property
 
 import psycopg2
 
-__version__ = (0, 1, 1)
+__version__ = (0, 1, 3, 'dev')
 
 logger = logging.getLogger(__name__)
 
