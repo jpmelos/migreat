@@ -102,6 +102,10 @@ class NoRollbackMigration(MigrationException):
         )
 
 
+class DropUsersForeignKeyDependencyAttempt(MigrationException):
+    """Raise when the users foreign key is blocking a rollback."""
+
+
 def _get_migration_sequence_number(migration_name):
     """Return the sequence number of a migration from its name.
 
@@ -354,6 +358,8 @@ def drop_user_id_foreign_key(
 ):
     """Drop the user_id foreign key.
 
+    Preprocesses the cursor args and kwargs.
+
     Args:
         cursor_factory: The DBAPI cursor factory to use to obtain a cursor to
             the database.
@@ -369,16 +375,27 @@ def drop_user_id_foreign_key(
         *cursor_factory_args,
         **cursor_factory_kwargs,
     ) as cursor:
-        try:
-            cursor.execute(
-                """
-                    ALTER TABLE migreat_migrations
-                        DROP CONSTRAINT migreat_migrations_user_id_fk;
-                """,
-            )
-            logger.info("Dropped the user_id foreign key constraint.")
-        except psycopg2.errors.UndefinedObject:
-            logger.info("user_id foreign key constraint doesn't exist.")
+        _drop_user_id_foreign_key(cursor)
+
+
+def _drop_user_id_foreign_key(cursor):
+    """Drop the user_id foreign key.
+
+    Preprocesses the cursor args and kwargs.
+
+    Args:
+        cursor: The cursor that will be used for any database queries.
+    """
+    try:
+        cursor.execute(
+            """
+                ALTER TABLE migreat_migrations
+                    DROP CONSTRAINT migreat_migrations_user_id_fk;
+            """,
+        )
+        logger.info("Dropped the user_id foreign key constraint.")
+    except psycopg2.errors.UndefinedObject:
+        logger.info("user_id foreign key constraint doesn't exist.")
 
 
 def _has_run_before(cursor, migration):
@@ -414,8 +431,11 @@ def _has_run_before(cursor, migration):
     return True
 
 
-def _run_migration(cursor, user_id, migration, rollback):
+def _run_migration_code(cursor, user_id, migration, rollback):
     """Run a migration.
+
+    Checks for known or expected errors and raises specific exceptions to each
+    of them.
 
     Args:
         cursor: The cursor to be used to make any database queries.
@@ -428,7 +448,12 @@ def _run_migration(cursor, user_id, migration, rollback):
             raise NoRollbackMigration(migration.name)
 
         if migration.rollback_code:
-            cursor.execute(migration.rollback_code)
+            try:
+                cursor.execute(migration.rollback_code)
+            except psycopg2.errors.DependentObjectsStillExist as e:
+                if "migreat_migrations_user_id_fk" in e.diag.message_detail:
+                    raise DropUsersForeignKeyDependencyAttempt
+                raise  # pragma: no cover
         cursor.execute(
             """
                 DELETE FROM migreat_migrations
@@ -448,6 +473,47 @@ def _run_migration(cursor, user_id, migration, rollback):
             """,
             (user_id, migration.name, migration.hash),
         )
+
+
+def _run_migration(
+    cursor,
+    user_id,
+    migration,
+    rollback,
+):
+    """Run a migration's code.
+
+    Args:
+        cursor: The cursor to be used to make any database queries.
+        user_id: The ID of the user that is running the migration.
+        migration: The migration to run.
+        rollback: Whether this is a rollback or not.
+    """
+    has_run_before = _has_run_before(cursor, migration)
+    should_run = has_run_before == rollback
+
+    if rollback:
+        name = migration.rollback_name
+    else:
+        name = migration.name
+
+    if should_run:
+        logger.info(f"Running {name}.")
+        try:
+            _run_migration_code(cursor, user_id, migration, rollback)
+        except DropUsersForeignKeyDependencyAttempt:
+            logger.info(
+                f"Failed to run {name} because of the users foreign key, will "
+                f"drop that and retry.",
+            )
+            raise
+        except Exception:
+            logger.info(f"Failed to run {name}.")
+            raise
+        else:
+            logger.info(f"Ran {name}.")
+    else:
+        logger.info(f"{name} has already run.")
 
 
 def run_migrations(
@@ -568,23 +634,28 @@ def run_migrations(
 
     # Run migrations.
     for migration in migrations:
-        with cursor_factory(
-            *cursor_factory_args,
-            **cursor_factory_kwargs,
-        ) as cursor:
-            has_run_before = _has_run_before(cursor, migration)
-            should_run = has_run_before == rollback
-
-            if rollback:
-                name = migration.rollback_name
-            else:
-                name = migration.name
-
-            if should_run:
-                logger.info(f"Running {name}.")
-                _run_migration(cursor, user_id, migration, rollback)
-                logger.info(f"Ran {name}.")
-            else:
-                logger.info(f"{name} has already run.")
+        try:
+            with cursor_factory(
+                *cursor_factory_args,
+                **cursor_factory_kwargs,
+            ) as cursor:
+                _run_migration(
+                    cursor,
+                    user_id,
+                    migration,
+                    rollback,
+                )
+        except DropUsersForeignKeyDependencyAttempt:
+            with cursor_factory(
+                *cursor_factory_args,
+                **cursor_factory_kwargs,
+            ) as cursor:
+                _drop_user_id_foreign_key(cursor)
+                _run_migration(
+                    cursor,
+                    user_id,
+                    migration,
+                    rollback,
+                )
 
     logger.info("Done.")

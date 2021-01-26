@@ -7,6 +7,7 @@ from migreat import (
     NoRollbackMigration,
     RepeatedMigrationSequenceNumber,
     _table_exists,
+    create_user_id_foreign_key,
     run_migrations,
 )
 from tests.fakepkg.postgresql import atomic
@@ -121,14 +122,9 @@ def test_it_runs_forward_from_previously_ran_migrations(
 
 
 def test_it_runs_when_no_migrations_left_to_run(
-    _migrations_table,
+    _migrations,
     migrations_dir,
 ):
-    run_migrations(
-        user_id=1,
-        migrations_dir=migrations_dir,
-        cursor_factory=atomic,
-    )
     run_migrations(
         user_id=1,
         migrations_dir=migrations_dir,
@@ -156,12 +152,7 @@ def test_it_runs_when_no_migrations_left_to_run(
         assert not cursor.fetchall()
 
 
-def test_it_runs_rollback(_migrations_table, migrations_dir):
-    run_migrations(
-        user_id=1,
-        migrations_dir=migrations_dir,
-        cursor_factory=atomic,
-    )
+def test_it_rolls_back(_migrations, migrations_dir):
     run_migrations(
         user_id=1,
         migrations_dir=migrations_dir,
@@ -173,7 +164,7 @@ def test_it_runs_rollback(_migrations_table, migrations_dir):
         assert not _table_exists(cursor, "customers")
 
 
-def test_it_runs_rollback_up_to_a_given_point(
+def test_it_rolls_back_up_to_a_given_point(
     _migrations_table,
     migrations_dir,
 ):
@@ -201,6 +192,26 @@ def test_it_runs_rollback_up_to_a_given_point(
 
         cursor.execute("SELECT username FROM users;")
         assert cursor.fetchone()[0] == "migreat"
+
+
+def test_it_rolls_back_when_users_foreign_key_exists(
+    _migrations,
+    migrations_dir,
+):
+    create_user_id_foreign_key(
+        cursor_factory=atomic,
+        users_table="users",
+        user_id_field="id",
+    )
+    run_migrations(
+        user_id=1,
+        migrations_dir=migrations_dir,
+        cursor_factory=atomic,
+        rollback=True,
+    )
+    with atomic() as cursor:
+        assert not _table_exists(cursor, "users")
+        assert not _table_exists(cursor, "customers")
 
 
 def test_it_does_nothing_rollback_when_no_migrations_ran(
