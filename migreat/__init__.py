@@ -6,7 +6,7 @@ import re
 
 import psycopg2
 
-__version__ = (0, 1, 3, "dev")
+__version__ = (0, 1, 3)
 
 logger = logging.getLogger(__name__)
 
