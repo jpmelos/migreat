@@ -85,39 +85,12 @@ Values are valid CSV strings and can contain nested commas inside proper delimit
 
 ## Development
 
-Clone the source code from GitHub.
+Clone the source code from GitHub, have a Docker Engine reachable and create a new virtual environment with Python 3.7+.
 
-Create a new virtual environment.
-
-Install dependencies:
+Run the tests with:
 
 ```
-pip install -r requirements.txt
+./run test
 ```
 
-Spin up a test database in a Docker Engine:
-
-```
-docker run -d \
-    --name db \
-    -p 127.0.0.1:5432:5432 \
-    -e POSTGRES_USER=migreat \
-    -e POSTGRES_PASSWORD=migreat \
-    postgres
-```
-
-Set up your environment:
-
-```
-export DB_HOST=127.0.0.1
-export DB_PORT=5432
-export DB_PASS=migreat
-export DB_USER=migreat
-```
-
-Run the tests:
-
-```
-coverage run -m pytest
-coverage report
-```
+It will build all the necessary images, set up the database and run the tests in all supported databases.

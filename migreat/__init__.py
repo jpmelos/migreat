@@ -3,11 +3,10 @@ import hashlib
 import logging
 import operator
 import re
-from functools import cached_property
 
 import psycopg2
 
-__version__ = (0, 1, 3, 'dev')
+__version__ = (0, 1, 3, "dev")
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +138,8 @@ class Migration:
 
         self.path = path
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def name(self):
         """The name of the forward migration file.
 
@@ -148,7 +148,8 @@ class Migration:
         """
         return self.path.name
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def rollback_name(self):
         """The name of the rollback migration file.
 
@@ -157,7 +158,8 @@ class Migration:
         """
         return self.path.name[:-4] + ".rollback.sql"
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def sequence_number(self):
         """The migration sequence number.
 
@@ -166,7 +168,8 @@ class Migration:
         """
         return _get_migration_sequence_number(self.name)
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def rollback_path(self):
         """The path to the rollback migration file.
 
@@ -175,7 +178,8 @@ class Migration:
         """
         return self.path.parent / self.rollback_name
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def code(self):
         """The forward migration code.
 
@@ -185,7 +189,8 @@ class Migration:
         with self.path.open() as fp:
             return fp.read()
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def rollback_code(self):
         """The rollback migration code.
 
@@ -197,7 +202,8 @@ class Migration:
                 return fp.read()
         return None
 
-    @cached_property
+    # TODO Can be @cached_property once we drop Pythyon 3.7
+    @property
     def hash(self):  # noqa: A003
         """The hash for a migration.
 

@@ -23,9 +23,9 @@ def find_version():
     patch = version_match.group("patch")
     prerelease = version_match.group("prerelease")
 
-    v = f'{major}.{minor}.{patch}'
+    v = f"{major}.{minor}.{patch}"
     if prerelease:
-        v += f'-{prerelease}'
+        v += f"-{prerelease}"
     return v
 
 
@@ -66,13 +66,13 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Database",
     ],
-    python_requires=">=3.6,<3.9",
+    python_requires=">=3.7,<3.10",
     packages=find_packages(include=["migreat", "migreat.*"]),
     install_requires=find_requires(),
     entry_points={"console_scripts": ["migreat=migreat.__main__:cli"]},
