@@ -6,13 +6,11 @@ import re
 
 import psycopg2
 
-__version__ = (0, 1, 4, "dev")
-
 logger = logging.getLogger(__name__)
 
 MIGRATION_PREFIX_REGEX = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{2}$")
 MIGRATION_NAME_REGEX = re.compile(
-    r"^\d{4}-\d{2}-\d{2}-\d{2}-[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]\.sql$",
+    r"^\d{4}-\d{2}-\d{2}-\d{2}-[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]\.sql$"
 )
 
 
@@ -38,7 +36,7 @@ class InvalidMigrationNameOrPrefix(MigrationException):
         self.migration_name = migration_name
 
         super().__init__(
-            f"Invalid migration name or prefix: {migration_name}.",
+            f"Invalid migration name or prefix: {migration_name}."
         )
 
 
@@ -57,7 +55,7 @@ class RepeatedMigrationSequenceNumber(MigrationException):
         self.sequence_number = sequence_number
 
         super().__init__(
-            f"Sequence number {sequence_number} has multiple occurrences.",
+            f"Sequence number {sequence_number} has multiple occurrences."
         )
 
 
@@ -79,7 +77,7 @@ class InvalidMigrationHash(MigrationException):
         super().__init__(
             f"Migration {migration_name} has different hash from file in disk"
             f" from hash found in the database: {actual_hash} !="
-            f" {expected_hash}.",
+            f" {expected_hash}."
         )
 
 
@@ -97,7 +95,7 @@ class NoRollbackMigration(MigrationException):
         self.migration_name = migration_name
 
         super().__init__(
-            f"Migration {migration_name} doesn't have rollback code",
+            f"Migration {migration_name} doesn't have rollback code"
         )
 
 
@@ -203,8 +201,8 @@ class Migration:
         return None
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
-    @property
-    def hash(self):  # noqa: A003
+    @property  # noqa: A003
+    def hash(self):
         """The hash for a migration.
 
         We store migration hashes in the database to make sure we are running
@@ -245,9 +243,7 @@ def _table_exists(cursor, table_name):
 
 
 def create_migrations_table(
-    cursor_factory,
-    cursor_factory_args=None,
-    cursor_factory_kwargs=None,
+    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
 ):
     """Create the migrations table.
 
@@ -266,8 +262,7 @@ def create_migrations_table(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args,
-        **cursor_factory_kwargs,
+        *cursor_factory_args, **cursor_factory_kwargs
     ) as cursor:
         try:
             cursor.execute(
@@ -281,7 +276,7 @@ def create_migrations_table(
                         hash VARCHAR(40) NOT NULL
                             CHECK (CHAR_LENGTH(hash) = 40)
                     );
-                """,
+                """
             )
             logger.info("Created migrations table.")
         except psycopg2.errors.DuplicateTable:
@@ -289,9 +284,7 @@ def create_migrations_table(
 
 
 def drop_migrations_table(
-    cursor_factory,
-    cursor_factory_args=None,
-    cursor_factory_kwargs=None,
+    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
 ):
     """Drop the migrations table.
 
@@ -307,8 +300,7 @@ def drop_migrations_table(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args,
-        **cursor_factory_kwargs,
+        *cursor_factory_args, **cursor_factory_kwargs
     ) as cursor:
         try:
             cursor.execute("DROP TABLE migreat_migrations;")
@@ -340,8 +332,7 @@ def create_user_id_foreign_key(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args,
-        **cursor_factory_kwargs,
+        *cursor_factory_args, **cursor_factory_kwargs
     ) as cursor:
         try:
             cursor.execute(
@@ -350,7 +341,7 @@ def create_user_id_foreign_key(
                         ADD CONSTRAINT migreat_migrations_user_id_fk
                             FOREIGN KEY (user_id)
                             REFERENCES {users_table} ({user_id_field});
-                """,
+                """
             )
             logger.info("Created the user_id foreign key constraint.")
         except psycopg2.errors.DuplicateObject:
@@ -358,9 +349,7 @@ def create_user_id_foreign_key(
 
 
 def drop_user_id_foreign_key(
-    cursor_factory,
-    cursor_factory_args=None,
-    cursor_factory_kwargs=None,
+    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
 ):
     """Drop the user_id foreign key.
 
@@ -378,8 +367,7 @@ def drop_user_id_foreign_key(
         cursor_factory_kwargs = {}
 
     with cursor_factory(
-        *cursor_factory_args,
-        **cursor_factory_kwargs,
+        *cursor_factory_args, **cursor_factory_kwargs
     ) as cursor:
         _drop_user_id_foreign_key(cursor)
 
@@ -397,7 +385,7 @@ def _drop_user_id_foreign_key(cursor):
             """
                 ALTER TABLE migreat_migrations
                     DROP CONSTRAINT migreat_migrations_user_id_fk;
-            """,
+            """
         )
         logger.info("Dropped the user_id foreign key constraint.")
     except psycopg2.errors.UndefinedObject:
@@ -429,9 +417,7 @@ def _has_run_before(cursor, migration):
     migration_hash = record[0]
     if migration_hash != migration.hash:
         raise InvalidMigrationHash(
-            migration.name,
-            migration.hash,
-            migration_hash,
+            migration.name, migration.hash, migration_hash
         )
 
     return True
@@ -481,12 +467,7 @@ def _run_migration_code(cursor, user_id, migration, rollback):
         )
 
 
-def _run_migration(
-    cursor,
-    user_id,
-    migration,
-    rollback,
-):
+def _run_migration(cursor, user_id, migration, rollback):
     """Run a migration's code.
 
     Args:
@@ -510,10 +491,10 @@ def _run_migration(
         except DropUsersForeignKeyDependencyAttempt:
             logger.info(
                 f"Failed to run {name} because of the users foreign key, will "
-                f"drop that and retry.",
+                f"drop that and retry."
             )
             raise
-        except Exception:
+        except Exception:  # noqa: B902
             logger.info(f"Failed to run {name}.")
             raise
         else:
@@ -608,7 +589,7 @@ def run_migrations(
         for migration in migrations:  # pragma: no branch, len(migrations) > 0
             if migration.sequence_number in seen_sequence_numbers:
                 raise RepeatedMigrationSequenceNumber(
-                    migration.sequence_number,
+                    migration.sequence_number
                 )
             seen_sequence_numbers.add(migration.sequence_number)
 
@@ -616,24 +597,17 @@ def run_migrations(
     if sequence_end:
         if rollback:
             migrations = list(
-                filter(
-                    lambda m: m.sequence_number >= sequence_end,
-                    migrations,
-                ),
+                filter(lambda m: m.sequence_number >= sequence_end, migrations)
             )
         else:
             migrations = list(
-                filter(
-                    lambda m: m.sequence_number <= sequence_end,
-                    migrations,
-                ),
+                filter(lambda m: m.sequence_number <= sequence_end, migrations)
             )
 
     logger.info(f"Found {len(migrations)} migrations.")
 
     with cursor_factory(
-        *cursor_factory_args,
-        **cursor_factory_kwargs,
+        *cursor_factory_args, **cursor_factory_kwargs
     ) as cursor:
         if not _table_exists(cursor, "migreat_migrations"):
             raise MigrationsTableDoesNotExist
@@ -642,26 +616,14 @@ def run_migrations(
     for migration in migrations:
         try:
             with cursor_factory(
-                *cursor_factory_args,
-                **cursor_factory_kwargs,
+                *cursor_factory_args, **cursor_factory_kwargs
             ) as cursor:
-                _run_migration(
-                    cursor,
-                    user_id,
-                    migration,
-                    rollback,
-                )
+                _run_migration(cursor, user_id, migration, rollback)
         except DropUsersForeignKeyDependencyAttempt:
             with cursor_factory(
-                *cursor_factory_args,
-                **cursor_factory_kwargs,
+                *cursor_factory_args, **cursor_factory_kwargs
             ) as cursor:
                 _drop_user_id_foreign_key(cursor)
-                _run_migration(
-                    cursor,
-                    user_id,
-                    migration,
-                    rollback,
-                )
+                _run_migration(cursor, user_id, migration, rollback)
 
     logger.info("Done.")

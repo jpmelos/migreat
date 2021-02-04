@@ -16,7 +16,7 @@ def dbms_connection():
     db_pass = os.environ["DB_PASS"]
 
     connection = psycopg2.connect(
-        f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/postgres",
+        f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/postgres"
     )
     connection.set_session(autocommit=True)
     yield connection
@@ -65,7 +65,5 @@ def _migrations_table():
 @pytest.fixture()
 def _migrations(_migrations_table, migrations_dir):
     run_migrations(
-        user_id=1,
-        migrations_dir=migrations_dir,
-        cursor_factory=atomic,
+        user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic
     )

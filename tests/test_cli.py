@@ -20,8 +20,8 @@ def _config_file():
                     [migreat]
                     user-id=42
                     cursor-factory=tests.fakepkg.postgresql.atomic
-                """,
-            )[1:],
+                """
+            )[1:]
         )
 
     yield
@@ -58,7 +58,7 @@ def test_it_calls_run_migrations_correctly(_migrations_table):
         shlex.split(
             "--migrations-dir tests/migrations"
             " --user-id 42"
-            " --cursor-factory tests.fakepkg.postgresql.atomic",
+            " --cursor-factory tests.fakepkg.postgresql.atomic"
         ),
     )
     if result.exception:
@@ -68,13 +68,11 @@ def test_it_calls_run_migrations_correctly(_migrations_table):
 
 
 def test_it_calls_run_migrations_correctly_with_config_file(
-    _config_file,
-    _migrations_table,
+    _config_file, _migrations_table
 ):
     runner = CliRunner()
     result = runner.invoke(
-        run,
-        shlex.split("--migrations-dir tests/migrations"),
+        run, shlex.split("--migrations-dir tests/migrations")
     )
     if result.exception:
         raise result.exception
@@ -88,7 +86,7 @@ def test_it_raises_when_missing_user_id():
         run,
         shlex.split(
             "--migrations-dir tests/migrations"
-            " --cursor-factory tests.fakepkg.postgresql.atomic",
+            " --cursor-factory tests.fakepkg.postgresql.atomic"
         ),
     )
 
@@ -98,8 +96,7 @@ def test_it_raises_when_missing_user_id():
 def test_it_raises_when_missing_cursor_factory():
     runner = CliRunner()
     result = runner.invoke(
-        run,
-        shlex.split("--migrations-dir tests/migrations --user-id 42"),
+        run, shlex.split("--migrations-dir tests/migrations --user-id 42")
     )
 
     assert isinstance(result.exception, ValueError)

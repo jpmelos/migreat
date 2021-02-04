@@ -2,9 +2,11 @@
 
 A flexible SQL migration runner.
 
-Right now, supports only PostgreSQL, as it's still an experiment. Support for any database with a DBAPI implementation is planned.
+Right now, supports only PostgreSQL via `psycopg2`, as it's still an experiment. Support for any database with a DBAPI implementation is planned.
 
 ## Install
+
+`migreat` supports Python 3.7, 3.8, and 3.9. Since it currently only supports PostgreSQL via `psycopg2`, it will also be installed.
 
 ```
 pip install migreat
@@ -85,12 +87,26 @@ Values are valid CSV strings and can contain nested commas inside proper delimit
 
 ## Development
 
-Clone the source code from GitHub, have a Docker Engine reachable and create a new virtual environment with Python 3.7+.
+Clone the source code from GitHub, have a Docker Engine reachable, have all supported Python interpreters in your `PATH` (we recommend that you use `pyenv` to manage different Python interpreters and environments) and create a new virtual environment with `poetry install`.
 
 Run the tests with:
 
 ```
-./run test
+./run test-db
+# Wait for the database to be ready
+./run all-tests
 ```
 
-It will build all the necessary images, set up the database and run the tests in all supported databases.
+To run a specific test:
+
+```
+./run test-db
+# Wait for the database to be ready
+./run test <test-address>
+```
+
+To make sure your code abides to our quality standards, run:
+
+```
+./run quality
+```

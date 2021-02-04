@@ -12,13 +12,13 @@ def atomic():
     db_pass = os.environ["DB_PASS"]
 
     connection = psycopg2.connect(
-        f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/migreat_tests",
+        f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/migreat_tests"
     )
 
     try:
         yield connection.cursor()
         connection.commit()
-    except Exception:
+    except Exception:  # noqa: B902
         connection.rollback()
         raise
     finally:

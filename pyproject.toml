@@ -1,2 +1,60 @@
+[tool.poetry]
+name = "migreat"
+version = "0.1.4-dev"
+description = "A flexible SQL migration runner."
+authors = ["João Sampaio <jpmelos@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/jpmelos/migreat"
+repository = "https://github.com/jpmelos/migreat"
+documentation = "https://github.com/jpmelos/migreat"
+keywords = ["database", "postgresql", "sql", "migrations"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Topic :: Database",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.10"
+click = ">=7.1,<8"
+psycopg2 = ">=2.8,<3"
+
+[tool.poetry.dev-dependencies]
+black = { git = "https://github.com/psf/black.git", rev = "692c0f50d91e3163bb87401e4a0e070b2eb5b163" }
+coverage = "*"
+flake8 = "*"
+flake8-2020 = "*"
+flake8-blind-except = "*"
+flake8-breakpoint = "*"
+flake8-broken-line = "*"
+flake8-bugbear = "*"
+flake8-builtins = "*"
+flake8-coding = "*"
+flake8-comprehensions = "*"
+flake8-if-expr = "*"
+flake8-print = "*"
+flake8-printf-formatting = "*"
+flake8-pytest-style = "*"
+flake8-return = "*"
+flake8-tidy-imports = "*"
+flake8-use-fstring = "*"
+ipython = "*"
+isort = "*"
+pydocstyle = "*"
+pytest = "*"
+tox = "*"
+tox-pyenv = "*"
+
+[tool.poetry.scripts]
+migreat = "migreat.__main__:cli"
+
 [tool.black]
 line-length = 79
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

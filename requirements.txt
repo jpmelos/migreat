@@ -1,2 +1,0 @@
--r min-requirements.txt
--r dev-min-requirements.txt
