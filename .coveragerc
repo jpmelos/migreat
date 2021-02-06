@@ -1,4 +1,5 @@
 [run]
+data_file = /tmp/migreat/.coverage
 source = migreat
 omit =
     migreat/__main__.py
@@ -13,5 +14,5 @@ skip_covered = True
 skip_empty = True
 
 [html]
-directory = htmlcov
+directory = /tmp/migreat/htmlcov
 show_contexts = True

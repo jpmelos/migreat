@@ -10,7 +10,7 @@ from migreat.__main__ import run
 from tests.fakepkg.postgresql import atomic
 
 
-@pytest.fixture()
+@pytest.fixture
 def _config_file():
     config_file_path = Path(".migreatrc")
     with config_file_path.open("w") as fp:

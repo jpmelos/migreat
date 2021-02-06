@@ -6,6 +6,4 @@ ignore = FS003,W503,PT019
 # flake8-coding
 no-accept-encodings = True
 # flake8-pytest-style
-pytest-parametrize-names-type = tuple
-pytest-parametrize-values-type = tuple
-pytest-parametrize-values-row-type = tuple
+pytest-fixture-no-parentheses = True

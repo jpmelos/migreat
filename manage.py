@@ -15,7 +15,7 @@ TEST_ENV = {
 }
 
 
-def _run(command, input_=None, pipe_output=False, env=None, check_errors=True):
+def _run(command, input_=None, pipe_output=False, env=None):
     """Runs a system command.
 
     Args:
@@ -23,7 +23,6 @@ def _run(command, input_=None, pipe_output=False, env=None, check_errors=True):
         input_: Any input you want to send to the process.
         pipe_output: Whether we should capture stdout and stderr.
         env: Environment variables to send to subprocess.
-        check_errors: Whether we should check if errors occurred.
 
     Returns:
         The completed process object.
@@ -38,15 +37,9 @@ def _run(command, input_=None, pipe_output=False, env=None, check_errors=True):
         kwargs["stdout"] = subprocess.PIPE
         kwargs["stderr"] = subprocess.PIPE
 
-    process = subprocess.run(
+    return subprocess.run(
         shlex.split(command), input=input_, text=True, env=env, **kwargs
     )
-    if check_errors:
-        try:
-            process.check_returncode()
-        except subprocess.CalledProcessError:
-            sys.stdout.write("Command failed\n")
-    return process
 
 
 @click.group()
@@ -65,14 +58,11 @@ def quality(check_only):
         isort_check_only = ""
         black_check_only = ""
 
-    isort = _run(
-        f"isort --profile black {isort_check_only} .", check_errors=False
-    ).returncode
+    isort = _run(f"isort --profile black {isort_check_only} .").returncode
     black = _run(
-        f"black {black_check_only} --skip-magic-trailing-comma .",
-        check_errors=False,
+        f"black {black_check_only} --skip-magic-trailing-comma ."
     ).returncode
-    flake8 = _run("flake8", check_errors=False).returncode
+    flake8 = _run("flake8").returncode
     if isort or black or flake8:
         sys.exit(1)
 
@@ -95,8 +85,8 @@ def test_db():
 def test(pytest_args):
     """Runs the automated test suite."""
     _run(f"coverage run -m pytest {' '.join(list(pytest_args))}", env=TEST_ENV)
-    _run("coverage report")
-    _run("coverage html")
+    if _run("coverage report").returncode:
+        sys.exit(1)
 
 
 @manage.command()

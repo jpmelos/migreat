@@ -13,22 +13,22 @@ from migreat import (
 from tests.fakepkg.postgresql import atomic
 
 
-@pytest.fixture()
+@pytest.fixture
 def migrations_empty_dir(this_path):
     return this_path / "migrations_empty"
 
 
-@pytest.fixture()
+@pytest.fixture
 def repeated_sq_migrations_dir(this_path):
     return this_path / "migrations_repeated_sq"
 
 
-@pytest.fixture()
+@pytest.fixture
 def no_rollback_migrations_dir(this_path):
     return this_path / "migrations_no_rollback"
 
 
-@pytest.fixture()
+@pytest.fixture
 def invalid_name_migrations_dir(this_path):
     return this_path / "migrations_invalid_name"
 

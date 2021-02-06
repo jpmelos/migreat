@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+./run quality --check-only
+
+# if [[ $(git rev-parse --abbrev-ref HEAD) = "master" ]]; then
+#   echo "Don't commit to master!!! If this is indeed what you need to do,"
+#   echo "use the --no-verify (-n) flag to bypass the pre-commit checks."
+#   exit 1
+# fi

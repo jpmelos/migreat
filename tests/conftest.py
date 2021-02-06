@@ -8,7 +8,7 @@ from migreat import create_migrations_table, run_migrations
 from tests.fakepkg.postgresql import atomic
 
 
-@pytest.fixture()
+@pytest.fixture
 def dbms_connection():
     db_host = os.environ["DB_HOST"]
     db_port = os.environ["DB_PORT"]
@@ -23,7 +23,7 @@ def dbms_connection():
     connection.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def dbms_cursor(dbms_connection):
     cursor = dbms_connection.cursor()
     yield cursor
@@ -37,7 +37,7 @@ def _db(dbms_cursor):
     dbms_cursor.execute("DROP DATABASE migreat_tests;")
 
 
-@pytest.fixture()
+@pytest.fixture
 def this_path(request):
     """The path of the file that contains the currently-running test.
 
@@ -51,18 +51,18 @@ def this_path(request):
     return pathlib.Path(request.fspath).parent.absolute()
 
 
-@pytest.fixture()
+@pytest.fixture
 def migrations_dir(this_path):
     """The migrations directory for tests."""
     return this_path / "migrations"
 
 
-@pytest.fixture()
+@pytest.fixture
 def _migrations_table():
     create_migrations_table(cursor_factory=atomic)
 
 
-@pytest.fixture()
+@pytest.fixture
 def _migrations(_migrations_table, migrations_dir):
     run_migrations(
         user_id=1, migrations_dir=migrations_dir, cursor_factory=atomic
