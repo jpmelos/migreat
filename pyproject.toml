@@ -40,10 +40,12 @@ flake8-print = "*"
 flake8-printf-formatting = "*"
 flake8-pytest-style = "*"
 flake8-return = "*"
+flake8-simplify = "*"
 flake8-tidy-imports = "*"
 flake8-use-fstring = "*"
 ipython = "*"
 isort = "*"
+logging_tree = "*"
 pydocstyle = "*"
 pytest = "*"
 tox = "*"
@@ -52,8 +54,16 @@ tox-pyenv = "*"
 [tool.poetry.scripts]
 migreat = "migreat.__main__:cli"
 
+[tool.isort]
+line_length = 79
+known_first_party = "migreat"
+
 [tool.black]
 line-length = 79
+
+[tool.pytest.ini_options]
+python_files = "tests/**.py"
+cache_dir = "/tmp/migreat/pytest_cache"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

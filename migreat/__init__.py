@@ -201,8 +201,8 @@ class Migration:
         return None
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
-    @property  # noqa: A003
-    def hash(self):
+    @property
+    def hash(self):  # noqa: A003
         """The hash for a migration.
 
         We store migration hashes in the database to make sure we are running
