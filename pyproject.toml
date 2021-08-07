@@ -24,7 +24,7 @@ click = ">=7.1,<8"
 psycopg2 = ">=2.8,<3"
 
 [tool.poetry.dev-dependencies]
-black = { git = "https://github.com/psf/black.git", rev = "692c0f50d91e3163bb87401e4a0e070b2eb5b163" }
+black = "*"
 coverage = "*"
 flake8 = "*"
 flake8-2020 = "*"
