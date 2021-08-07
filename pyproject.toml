@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "migreat"
-version = "0.1.4-dev"
+version = "0.1.5-dev"
 description = "A flexible SQL migration runner."
 authors = ["João Sampaio <jpmelos@gmail.com>"]
 license = "MIT"
