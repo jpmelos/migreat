@@ -46,6 +46,7 @@ flake8-use-fstring = "*"
 ipython = "*"
 isort = "*"
 logging_tree = "*"
+mypy = "*"
 pydocstyle = "*"
 pytest = "*"
 tox = "*"
@@ -60,6 +61,57 @@ known_first_party = "migreat"
 
 [tool.black]
 line-length = 79
+
+[tool.mypy]
+python_version = "3.9"
+files = "migreat"
+namespace_packages = true
+explicit_package_bases = true
+ignore_missing_imports = false
+follow_imports = "normal"
+no_site_packages = false
+no_silence_site_packages = false
+
+allow_any_unimported = true
+allow_any_expr = true
+allow_any_decorated = true
+allow_any_explicit = true
+allow_any_generics = true
+allow_subclassing_any = true
+
+allow_untyped_calls = true
+allow_untyped_defs = false
+allow_incomplete_defs = false
+check_untyped_defs = true
+allow_untyped_decorators = true
+
+no_implicit_optional = true
+strict_optional = true
+
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_unreachable = true
+
+show_none_errors = true
+ignore_errors = false
+
+allow_untyped_globals = false
+allow_redefinition = true
+local_partial_types = false
+implicit_reexport = false
+strict_equality = true
+
+show_error_context = true
+pretty = true
+color_output = true
+error_summary = true
+show_absolute_path = false
+
+[[tool.mypy.overrides]]
+module = "psycopg2"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 python_files = "tests/**.py"

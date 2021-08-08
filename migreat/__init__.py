@@ -3,6 +3,8 @@ import hashlib
 import logging
 import operator
 import re
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 import psycopg2
 
@@ -27,7 +29,7 @@ class MigrationsTableDoesNotExist(MigrationException):
 class InvalidMigrationNameOrPrefix(MigrationException):
     """Raise when a prefix or a name of a migration is invalid."""
 
-    def __init__(self, migration_name):
+    def __init__(self, migration_name: str):
         """Raise when a prefix or a name of a migration is invalid.
 
         Args:
@@ -45,7 +47,7 @@ class RepeatedMigrationSequenceNumber(MigrationException):
     Raise when there are multiple migrations with the same sequence number.
     """
 
-    def __init__(self, sequence_number):
+    def __init__(self, sequence_number: int):
         """
         Raise when there are multiple migrations with the same sequence number.
 
@@ -62,7 +64,9 @@ class RepeatedMigrationSequenceNumber(MigrationException):
 class InvalidMigrationHash(MigrationException):
     """Raise when a migration hash in the database doesn't match the files."""
 
-    def __init__(self, migration_name, actual_hash, expected_hash):
+    def __init__(
+        self, migration_name: str, actual_hash: str, expected_hash: str
+    ):
         """Raise when a migration hash in the database doesn't match the files.
 
         Args:
@@ -84,7 +88,7 @@ class InvalidMigrationHash(MigrationException):
 class NoRollbackMigration(MigrationException):
     """Raise when there is no rollback for a migration selected to rollback."""
 
-    def __init__(self, migration_name):
+    def __init__(self, migration_name: str):
         """
         Raise when there is no rollback for a migration selected to rollback.
 
@@ -103,7 +107,7 @@ class DropUsersForeignKeyDependencyAttempt(MigrationException):
     """Raise when the users foreign key is blocking a rollback."""
 
 
-def _get_migration_sequence_number(migration_name):
+def _get_migration_sequence_number(migration_name: str) -> int:
     """Return the sequence number of a migration from its name.
 
     Args:
@@ -125,7 +129,7 @@ def _get_migration_sequence_number(migration_name):
 class Migration:
     """Represent a migration."""
 
-    def __init__(self, path):
+    def __init__(self, path: Path):
         """Represent a migration.
 
         Args:
@@ -138,7 +142,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the forward migration file.
 
         Returns:
@@ -148,7 +152,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def rollback_name(self):
+    def rollback_name(self) -> str:
         """The name of the rollback migration file.
 
         Returns:
@@ -158,7 +162,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def sequence_number(self):
+    def sequence_number(self) -> int:
         """The migration sequence number.
 
         Returns:
@@ -168,7 +172,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def rollback_path(self):
+    def rollback_path(self) -> Path:
         """The path to the rollback migration file.
 
         Returns:
@@ -178,7 +182,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def code(self):
+    def code(self) -> str:
         """The forward migration code.
 
         Returns:
@@ -189,7 +193,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def rollback_code(self):
+    def rollback_code(self) -> Optional[str]:
         """The rollback migration code.
 
         Returns:
@@ -202,7 +206,7 @@ class Migration:
 
     # TODO Can be @cached_property once we drop Pythyon 3.7
     @property
-    def hash(self):  # noqa: A003
+    def hash(self) -> str:  # noqa: A003
         """The hash for a migration.
 
         We store migration hashes in the database to make sure we are running
@@ -216,7 +220,7 @@ class Migration:
         return hashlib.sha1(code_to_hash.encode("utf-8")).digest().hex()
 
 
-def _table_exists(cursor, table_name):
+def _table_exists(cursor: Any, table_name: str) -> bool:
     """Return whether a table exists among the visible tables to the cursor.
 
     Args:
@@ -243,8 +247,10 @@ def _table_exists(cursor, table_name):
 
 
 def create_migrations_table(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
-):
+    cursor_factory: Callable,
+    cursor_factory_args: Optional[List[str]] = None,
+    cursor_factory_kwargs: Optional[Dict[str, str]] = None,
+) -> None:
     """Create the migrations table.
 
     This table stores information about previously run migrations for log
@@ -284,8 +290,10 @@ def create_migrations_table(
 
 
 def drop_migrations_table(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
-):
+    cursor_factory: Callable,
+    cursor_factory_args: Optional[List[str]] = None,
+    cursor_factory_kwargs: Optional[Dict[str, str]] = None,
+) -> None:
     """Drop the migrations table.
 
     Args:
@@ -310,12 +318,12 @@ def drop_migrations_table(
 
 
 def create_user_id_foreign_key(
-    users_table,
-    user_id_field,
-    cursor_factory,
-    cursor_factory_args=None,
-    cursor_factory_kwargs=None,
-):
+    users_table: str,
+    user_id_field: str,
+    cursor_factory: Callable,
+    cursor_factory_args: Optional[List[str]] = None,
+    cursor_factory_kwargs: Optional[Dict[str, str]] = None,
+) -> None:
     """Make `user_id` field in the migrations table refer to an actual user ID.
 
     Args:
@@ -349,8 +357,10 @@ def create_user_id_foreign_key(
 
 
 def drop_user_id_foreign_key(
-    cursor_factory, cursor_factory_args=None, cursor_factory_kwargs=None
-):
+    cursor_factory: Callable,
+    cursor_factory_args: Optional[List[str]] = None,
+    cursor_factory_kwargs: Optional[Dict[str, str]] = None,
+) -> None:
     """Drop the user_id foreign key.
 
     Preprocesses the cursor args and kwargs.
@@ -372,7 +382,7 @@ def drop_user_id_foreign_key(
         _drop_user_id_foreign_key(cursor)
 
 
-def _drop_user_id_foreign_key(cursor):
+def _drop_user_id_foreign_key(cursor: Any) -> None:
     """Drop the user_id foreign key.
 
     Preprocesses the cursor args and kwargs.
@@ -392,7 +402,7 @@ def _drop_user_id_foreign_key(cursor):
         logger.info("user_id foreign key constraint doesn't exist.")
 
 
-def _has_run_before(cursor, migration):
+def _has_run_before(cursor: Any, migration: Migration) -> bool:
     """Return whether a migration has run before.
 
     Args:
@@ -423,7 +433,9 @@ def _has_run_before(cursor, migration):
     return True
 
 
-def _run_migration_code(cursor, user_id, migration, rollback):
+def _run_migration_code(
+    cursor: Any, user_id: str, migration: Migration, rollback: bool
+) -> None:
     """Run a migration.
 
     Checks for known or expected errors and raises specific exceptions to each
@@ -467,7 +479,9 @@ def _run_migration_code(cursor, user_id, migration, rollback):
         )
 
 
-def _run_migration(cursor, user_id, migration, rollback):
+def _run_migration(
+    cursor: Any, user_id: str, migration: Migration, rollback: bool
+) -> None:
     """Run a migration's code.
 
     Args:
@@ -504,14 +518,14 @@ def _run_migration(cursor, user_id, migration, rollback):
 
 
 def run_migrations(
-    user_id,
-    migrations_dir,
-    cursor_factory,
-    cursor_factory_args=None,
-    cursor_factory_kwargs=None,
-    last_migration=None,
-    rollback=False,
-):
+    user_id: str,
+    migrations_dir: Path,
+    cursor_factory: Callable,
+    cursor_factory_args: Optional[List[str]] = None,
+    cursor_factory_kwargs: Optional[Dict[str, str]] = None,
+    last_migration: Optional[str] = None,
+    rollback: bool = False,
+) -> None:
     """Run all the migrations selected.
 
     The expected format for migration names is:
@@ -553,15 +567,6 @@ def run_migrations(
 
     logger.info("Starting migration procedure.")
 
-    if last_migration:
-        sequence_end = _get_migration_sequence_number(last_migration)
-        if rollback:
-            logger.info(f"Running migrations back up to {last_migration}.")
-        else:
-            logger.info(f"Running migrations up to {last_migration}.")
-    else:
-        sequence_end = None
-
     # Get all migrations ordered by sequence number.
     migration_paths = [
         migration_file
@@ -577,7 +582,7 @@ def run_migrations(
     )
 
     if not migrations:
-        logger.info("Done.")
+        logger.info("No migrations fonud. Done.")
         return
 
     # Verify all sequence numbers are unique.
@@ -594,12 +599,15 @@ def run_migrations(
             seen_sequence_numbers.add(migration.sequence_number)
 
     # If specified a stop, deselect the migrations that shouldn't be applied.
-    if sequence_end:
+    if last_migration:
+        sequence_end = _get_migration_sequence_number(last_migration)
         if rollback:
+            logger.info(f"Running migrations back up to {last_migration}.")
             migrations = list(
                 filter(lambda m: m.sequence_number >= sequence_end, migrations)
             )
         else:
+            logger.info(f"Running migrations up to {last_migration}.")
             migrations = list(
                 filter(lambda m: m.sequence_number <= sequence_end, migrations)
             )

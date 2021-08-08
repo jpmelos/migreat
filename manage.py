@@ -63,7 +63,8 @@ def quality(check_only):
         f"black {black_check_only} --skip-magic-trailing-comma ."
     ).returncode
     flake8 = _run("flake8").returncode
-    if isort or black or flake8:
+    mypy = _run("mypy").returncode
+    if isort or black or flake8 or mypy:
         sys.exit(1)
 
 
